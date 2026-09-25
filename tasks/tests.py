@@ -153,6 +153,28 @@ class ActionTests(PlannerTestCase):
         self.assertIn('title', response.context['form'].errors)
 
 
+class PagesOpenTests(PlannerTestCase):
+    """Каждая страница владельца открывается обычным переходом по ссылке."""
+
+    def setUp(self):
+        self.client.force_login(self.dmitry)
+
+    def test_all_owner_pages_render(self):
+        pages = [
+            self.link('index'), self.link('list'), self.link('new'),
+            self.link('detail', self.task.pk), self.link('edit', self.task.pk),
+            self.link('delete', self.task.pk), self.link('categories'),
+            reverse('users:profile'), reverse('users:password_change'),
+        ]
+        for url in pages:
+            with self.subTest(url=url):
+                self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_category_delete_page_renders(self):
+        category = Category.objects.create(owner=self.dmitry, name='Дом')
+        self.assertEqual(self.client.get(self.link('category_delete', category.pk)).status_code, 200)
+
+
 class ListLogicTests(PlannerTestCase):
     def setUp(self):
         self.client.force_login(self.olga)
