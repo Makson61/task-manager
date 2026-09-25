@@ -1,0 +1,71 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        database: [sqlite, postgres]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: django
+          POSTGRES_PASSWORD: django
+          POSTGRES_DB: django
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: ${{ matrix.database == 'postgres' && 'postgresql://django:django@localhost:5432/django' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python manage.py check
+      - run: python manage.py makemigrations --check --dry-run
+      - run: python manage.py test --verbosity 2
+      - name: Проверка настроек для сервера
+        run: python manage.py check --deploy --fail-level ERROR
+        env:
+          DJANGO_DEBUG: "False"
+          DJANGO_SECRET_KEY: ci-only-key-long-enough-for-the-deploy-check-0123456789
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Запуск через docker compose
+        run: |
+          printf 'DJANGO_SECRET_KEY=ci-secret-key-0123456789-abcdefghijklmnopqrstuvwxyz\nDJANGO_DEBUG=False\nDJANGO_SUPERUSER_USERNAME=admin\nDJANGO_SUPERUSER_PASSWORD=ci-Admin-pass-1\n' > .env
+          docker compose up -d --build
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/healthz/ && break; sleep 2; done
+          curl -fsS http://127.0.0.1:8000/ > /dev/null
+          docker compose logs web
+
+  deploy:
+    # Разворачивает на Render только код из main, прошедший проверки выше.
+    # Нужны секрет RENDER_API_KEY и переменная RENDER_SERVICE_ID.
+    needs: [test, docker]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Запустить деплой на Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
+            echo "Render не настроен, деплой пропущен."; exit 0
+          fi
+          curl -fsS -X POST "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
+            -H "Authorization: Bearer $RENDER_API_KEY" -H "Content-Type: application/json" \
+            -d "{\"commitId\": \"$GITHUB_SHA\"}" > /dev/null
+          echo "Деплой $GITHUB_SHA запущен."

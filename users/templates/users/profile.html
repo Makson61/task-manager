@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Мой аккаунт &middot; {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="panel panel-narrow mx-auto">
+  <div class="panel-head"><h1 class="h5 mb-0">Мой аккаунт</h1></div>
+  <div class="panel-body">
+    <dl class="row mb-4">
+      <dt class="col-5">Имя пользователя</dt><dd class="col-7">{{ user.username }}</dd>
+      <dt class="col-5">Почта</dt><dd class="col-7">{{ user.email|default:"не указана" }}</dd>
+      <dt class="col-5">Регистрация</dt><dd class="col-7">{{ user.date_joined|date:"j E Y" }}</dd>
+      <dt class="col-5">Последний вход</dt><dd class="col-7">{{ user.last_login|date:"j E Y, H:i" }}</dd>
+    </dl>
+    <a class="btn btn-outline-secondary btn-block mb-2" href="{% url 'users:password_change' %}">Сменить пароль</a>
+    <form method="post" action="{% url 'users:logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger btn-block">Выйти из аккаунта</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

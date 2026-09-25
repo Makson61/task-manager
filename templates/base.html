@@ -1,0 +1,68 @@
+{% load bootstrap4 static %}<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Планировщик задач: сроки, приоритеты, категории и отметка выполнения.">
+  <title>{% block title %}Планировщик{% endblock %}</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗓️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+  {% bootstrap_css %}
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% bootstrap_javascript jquery='full' %}
+</head>
+<body>
+<header class="topbar">
+  <nav class="navbar navbar-expand-lg navbar-dark container">
+    <a class="navbar-brand" href="{% url 'tasks:index' %}"><span class="mark">🗓️</span>Планировщик</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu"
+            aria-controls="mainmenu" aria-expanded="false" aria-label="Показать меню">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainmenu">
+      <ul class="navbar-nav mr-auto">{% block menu %}{% endblock %}</ul>
+      <ul class="navbar-nav align-items-lg-center">
+        {% if user.is_authenticated %}
+          {% block menu_actions %}{% endblock %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="usermenu" role="button"
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ user.username }}</a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="usermenu">
+              <a class="dropdown-item" href="{% url 'users:profile' %}">Мой аккаунт</a>
+              <a class="dropdown-item" href="{% url 'users:password_change' %}">Сменить пароль</a>
+              {% if user.is_staff %}
+                <a class="dropdown-item" href="{% url 'admin:index' %}">Админка</a>
+              {% endif %}
+              <div class="dropdown-divider"></div>
+              <form method="post" action="{% url 'users:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item text-danger">Выйти</button>
+              </form>
+            </div>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'users:login' %}">Вход</a></li>
+          <li class="nav-item"><a class="btn btn-accent btn-sm ml-lg-2 my-2 my-lg-0"
+                                  href="{% url 'users:register' %}">Регистрация</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main class="container py-4">
+  {% bootstrap_messages %}
+  {% block page_header %}{% endblock %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <div class="container d-flex flex-wrap justify-content-between">
+    <span>Планировщик &middot; учебный проект на Django</span>
+    <span>{% now "Y" %}</span>
+  </div>
+</footer>
+</body>
+</html>

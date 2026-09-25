@@ -1,0 +1,195 @@
+/* Оформление поверх Bootstrap 4: строгий светлый интерфейс с тёмной шапкой. */
+
+:root {
+  --accent: #1d4ed8;
+  --accent-dark: #1e3a8a;
+  --accent-soft: #dbeafe;
+  --accent-rgb: 29, 78, 216;
+  --bg: #f5f5f4;
+  --panel: #ffffff;
+  --ink: #1c1917;
+  --muted: #78716c;
+  --line: #e7e5e4;
+  --radius: 4px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main { flex: 1 0 auto; }
+
+h1, h2, h3, h4, h5 { font-weight: 600; letter-spacing: -.01em; }
+a { color: var(--accent-dark); }
+a:hover { color: var(--accent); }
+
+/* Длинные слова и адреса не растягивают страницу. */
+.wrap-any, .rich-text, .panel-body, td, h1, h2, h3 { overflow-wrap: anywhere; }
+.rich-text { white-space: pre-line; line-height: 1.7; }
+
+/* Шапка */
+.topbar { background: #1c1917; border-bottom: 3px solid var(--accent); }
+.topbar .navbar { padding-left: 0; padding-right: 0; }
+.navbar-brand { font-weight: 700; display: flex; align-items: center; gap: .5rem; }
+.navbar-brand .mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.9rem; height: 1.9rem; border-radius: var(--radius);
+  background: var(--accent); font-size: 1rem;
+}
+.navbar-dark .navbar-nav .nav-link { color: rgba(255, 255, 255, .72); font-weight: 500; }
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active { color: #fff; }
+.navbar-dark .navbar-nav .nav-link.active { box-shadow: inset 0 -2px 0 var(--accent); }
+.dropdown-item.text-danger:hover { background: #fee2e2; }
+
+/* Кнопки */
+.btn { border-radius: var(--radius); font-weight: 500; }
+.btn-accent { background: var(--accent); border: 1px solid var(--accent); color: #fff; }
+.btn-accent:hover, .btn-accent:focus { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+.btn-outline-accent { border: 1px solid var(--accent); color: var(--accent-dark); background: transparent; }
+.btn-outline-accent:hover { background: var(--accent); color: #fff; }
+.form-control:focus, .custom-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 .2rem rgba(var(--accent-rgb), .18);
+}
+.form-control, .custom-select, .input-group-text { border-radius: var(--radius); }
+
+/* Панели вместо карточек */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.panel + .panel { margin-top: 1rem; }
+.panel-head {
+  padding: .75rem 1.25rem; border-bottom: 1px solid var(--line);
+  background: #fafaf9; display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+}
+.panel-body { padding: 1.25rem; }
+.panel-narrow { max-width: 26rem; }
+.panel-wide { max-width: 46rem; }
+
+/* Заголовок страницы */
+.page-head {
+  display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-end; justify-content: space-between;
+  padding-bottom: .75rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--line);
+}
+.page-head h1 { font-size: 1.6rem; margin: 0; }
+.page-head .subtitle { margin: .25rem 0 0; color: var(--muted); font-size: .95rem; }
+
+/* Обложка главной страницы */
+.cover {
+  background: #1c1917 repeating-linear-gradient(135deg, rgba(var(--accent-rgb), .22) 0 14px, transparent 14px 28px);
+  color: #fff; border-radius: var(--radius); padding: 3rem 2rem; margin-bottom: 2rem;
+  border-left: 6px solid var(--accent);
+}
+.cover h1 { font-size: 2.1rem; font-weight: 700; }
+.cover p { color: rgba(255, 255, 255, .8); max-width: 40rem; font-size: 1.1rem; }
+
+/* Плитки со счётчиками */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.tile {
+  background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+  border-radius: var(--radius); padding: 1rem; text-align: center; color: inherit;
+}
+a.tile:hover { border-color: var(--accent); text-decoration: none; }
+.tile .num { font-size: 1.75rem; font-weight: 700; line-height: 1.1; }
+.tile .cap { color: var(--muted); font-size: .85rem; }
+
+/* Таблицы и списки */
+.table { background: var(--panel); margin-bottom: 0; }
+.table thead th { border-top: 0; border-bottom: 2px solid var(--line); font-size: .8rem;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+.table td { vertical-align: middle; }
+.list-group-item { border-color: var(--line); border-radius: 0 !important; }
+.list-group-item-action:hover { background: var(--accent-soft); }
+
+/* Боковая панель фильтров */
+.sidebar .panel-body { padding: 1rem; }
+.sidebar .nav-link { color: var(--ink); padding: .4rem .6rem; border-radius: var(--radius); }
+.sidebar .nav-link:hover { background: var(--accent-soft); }
+.sidebar .nav-link.active { background: var(--accent); color: #fff; }
+.sidebar .count { float: right; opacity: .7; }
+
+/* Значки */
+.badge { border-radius: var(--radius); font-weight: 600; padding: .3em .55em; }
+.badge-accent { background: var(--accent-soft); color: var(--accent-dark); }
+.badge-tag { background: #f5f5f4; color: #44403c; border: 1px solid var(--line); font-weight: 500; }
+a.badge-tag:hover { background: var(--accent-soft); color: var(--accent-dark); text-decoration: none; }
+
+/* Пустое состояние и служебные страницы */
+.empty, .notice {
+  background: var(--panel); border: 1px dashed var(--line); border-radius: var(--radius);
+  padding: 2.5rem 1.25rem; text-align: center; color: var(--muted);
+}
+.notice-icon { font-size: 2.5rem; font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: .5rem; }
+.empty .icon { font-size: 2rem; display: block; margin-bottom: .5rem; }
+
+.meta { color: var(--muted); font-size: .875rem; }
+.breadcrumb { background: transparent; padding: 0; margin-bottom: .75rem; font-size: .9rem; flex-wrap: nowrap; }
+.breadcrumb-item { white-space: nowrap; }
+.breadcrumb-item.active { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+.page-link { color: var(--accent-dark); border-radius: var(--radius) !important; }
+.page-item.active .page-link { background: var(--accent); border-color: var(--accent); }
+
+.footer { background: #1c1917; color: rgba(255, 255, 255, .55); font-size: .85rem; padding: 1rem 0; }
+
+@media (max-width: 767.98px) {
+  .cover { padding: 2rem 1.25rem; }
+  .cover h1 { font-size: 1.6rem; }
+  .cover p { font-size: 1rem; }
+  .page-head { align-items: stretch; }
+  .page-head > div { width: 100%; }
+  /* Кнопки в заголовке: в строку, с переносом и без выхода за край экрана. */
+  .page-head .text-nowrap { white-space: normal; display: flex; flex-wrap: wrap; gap: .5rem; width: 100%; }
+  .page-head .text-nowrap > .btn { flex: 1 1 auto; margin: 0 !important; }
+  .page-head > .btn, .page-head > a.btn { width: 100%; }
+  .tiles { grid-template-columns: 1fr; gap: .5rem; }
+  .tile { display: flex; align-items: baseline; justify-content: space-between; text-align: left; }
+  .table-responsive { border: 0; }
+}
+
+/* --- Планировщик: таблица задач -------------------------------------------- */
+.td-check { width: 3rem; }
+.check {
+  width: 1.6rem; height: 1.6rem; padding: 0; line-height: 1;
+  border: 2px solid #a8a29e; background: #fff; color: #fff; cursor: pointer;
+  border-radius: var(--radius); font-weight: 700;
+}
+.check:hover { border-color: var(--accent); background: var(--accent-soft); }
+.check.on { background: var(--accent); border-color: var(--accent); }
+
+.task-title { font-weight: 600; color: var(--ink); }
+.task-title:hover { color: var(--accent-dark); }
+.task-row.state-done .task-title { text-decoration: line-through; color: var(--muted); }
+.task-row.state-overdue { background: #fef2f2; }
+.task-row.state-overdue .due { color: #b91c1c; font-weight: 600; }
+.task-row.state-soon { background: #fffbeb; }
+.panel.state-overdue { border-left: 4px solid #dc2626; }
+.panel.state-soon { border-left: 4px solid #d97706; }
+.panel.state-done { border-left: 4px solid #16a34a; }
+
+.badge-high { background: #fee2e2; color: #991b1b; }
+.badge-normal { background: #e0e7ff; color: #3730a3; }
+.badge-low { background: #f5f5f4; color: #57534e; }
+.badge-late { background: #dc2626; color: #fff; }
+.badge-soon { background: #fef08a; color: #713f12; }
+.badge-done { background: #dcfce7; color: #166534; }
+
+/* Приоритет выбирается переключателями в одну строку. */
+.priority-choice .form-check { display: inline-block; margin-right: 1.25rem; }
+
+/* На узком экране таблица задач превращается в карточки: узкие колонки
+   иначе рвут слова по буквам. */
+@media (max-width: 767.98px) {
+  .task-table thead { display: none; }
+  .task-table, .task-table tbody, .task-table tr, .task-table td { display: block; width: 100%; }
+  .task-table tr { position: relative; padding: .75rem .75rem .75rem 3.25rem; border-bottom: 1px solid var(--line); }
+  .task-table td { border: 0; padding: .1rem 0; }
+  .task-table .td-check { position: absolute; left: .85rem; top: .95rem; width: auto; padding: 0; }
+  .task-table .text-right { text-align: left !important; }
+  .task-table .btn-sm { padding-left: 0; }
+  .task-table .badge { margin-right: .25rem; }
+}

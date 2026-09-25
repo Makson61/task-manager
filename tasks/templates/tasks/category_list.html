@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Категории &middot; {{ block.super }}{% endblock %}
+
+{% block menu %}
+  <li class="nav-item"><a class="nav-link" href="{% url 'tasks:list' %}">Задачи</a></li>
+  <li class="nav-item"><a class="nav-link active" href="{% url 'tasks:categories' %}">Категории</a></li>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-head">
+  <div>
+    <h1>Категории</h1>
+    <p class="subtitle">По ним удобно фильтровать список задач.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-7 mb-3">
+    <div class="panel">
+      <div class="panel-head"><span class="small font-weight-bold">Мои категории</span></div>
+      {% if categories %}
+        <div class="list-group list-group-flush">
+          {% for category in categories %}
+            <div class="list-group-item d-flex align-items-center justify-content-between">
+              <span>
+                <a href="{% url 'tasks:list' %}?tab=all&amp;category={{ category.pk }}">{{ category.name }}</a>
+                <span class="meta">· задач: {{ category.total }}</span>
+              </span>
+              <a class="btn btn-sm btn-link text-danger"
+                 href="{% url 'tasks:category_delete' category.pk %}">Удалить</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="panel-body text-muted">Категорий пока нет. Добавьте первую справа.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="panel">
+      <div class="panel-head"><span class="small font-weight-bold">Новая категория</span></div>
+      <div class="panel-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          {% bootstrap_button 'Добавить' button_type='submit' button_class='btn-accent btn-block' %}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

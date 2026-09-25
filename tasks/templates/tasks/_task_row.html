@@ -1,0 +1,40 @@
+{% comment %}Строка таблицы задач. Ожидает переменную task.{% endcomment %}
+<tr class="task-row state-{{ task.state }}">
+  <td class="td-check">
+    <form method="post" action="{% url 'tasks:toggle' task.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button type="submit" class="check{% if task.completed %} on{% endif %}"
+              title="{% if task.completed %}Вернуть в работу{% else %}Отметить выполненной{% endif %}"
+              aria-label="{% if task.completed %}Вернуть в работу{% else %}Отметить выполненной{% endif %}: {{ task.title }}">
+        {% if task.completed %}✓{% endif %}
+      </button>
+    </form>
+  </td>
+  <td>
+    <a class="task-title" href="{% url 'tasks:detail' task.pk %}">{{ task.title }}</a>
+    {% if task.description %}<div class="meta d-none d-md-block">{{ task.description|truncatechars:90 }}</div>{% endif %}
+    {% if task.category %}<span class="badge badge-tag mt-1">{{ task.category.name }}</span>{% endif %}
+  </td>
+  <td class="d-none d-sm-table-cell">{% include 'tasks/_priority.html' %}</td>
+  <td>
+    {% if task.due_date %}
+      <span class="due">{{ task.due_date|date:"d.m.Y H:i" }}</span>
+    {% else %}
+      <span class="meta">без срока</span>
+    {% endif %}
+    <div>
+      {% if task.state == 'done' %}
+        <span class="badge badge-done">✓ выполнена</span>
+      {% elif task.state == 'overdue' %}
+        <span class="badge badge-late">! просрочена</span>
+      {% elif task.state == 'soon' %}
+        <span class="badge badge-soon">● скоро срок</span>
+      {% endif %}
+    </div>
+  </td>
+  <td class="text-right text-nowrap">
+    <a class="btn btn-sm btn-link" href="{% url 'tasks:edit' task.pk %}?next={{ request.get_full_path|urlencode }}">Изменить</a>
+    <a class="btn btn-sm btn-link text-danger" href="{% url 'tasks:delete' task.pk %}">Удалить</a>
+  </td>
+</tr>

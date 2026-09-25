@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }} &middot; {{ block.super }}{% endblock %}
+
+{% block menu %}
+  <li class="nav-item"><a class="nav-link active" href="{% url 'tasks:list' %}">Задачи</a></li>
+  <li class="nav-item"><a class="nav-link" href="{% url 'tasks:categories' %}">Категории</a></li>
+{% endblock %}
+
+{% block content %}
+<nav aria-label="Хлебные крошки">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'tasks:list' %}">Мои задачи</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ task.title }}</li>
+  </ol>
+</nav>
+
+<div class="panel panel-wide state-{{ task.state }}">
+  <div class="panel-head">
+    <h1 class="h5 mb-0 wrap-any">{{ task.title }}</h1>
+    {% if task.state == 'done' %}<span class="badge badge-done">✓ выполнена</span>
+    {% elif task.state == 'overdue' %}<span class="badge badge-late">! просрочена</span>
+    {% elif task.state == 'soon' %}<span class="badge badge-soon">● скоро срок</span>
+    {% else %}<span class="badge badge-accent">в работе</span>{% endif %}
+  </div>
+  <div class="panel-body">
+    {% if task.description %}
+      <div class="rich-text mb-4">{{ task.description }}</div>
+    {% else %}
+      <p class="meta">Описание не заполнено.</p>
+    {% endif %}
+
+    <table class="table table-sm mb-4">
+      <tr><th class="w-50">Приоритет</th><td>{% include 'tasks/_priority.html' %}</td></tr>
+      <tr><th>Срок</th><td>{% if task.due_date %}{{ task.due_date|date:"j E Y, H:i" }}{% else %}не задан{% endif %}</td></tr>
+      <tr><th>Категория</th><td>{{ task.category.name|default:"без категории" }}</td></tr>
+      <tr><th>Создана</th><td>{{ task.date_added|date:"j E Y, H:i" }}</td></tr>
+      {% if task.completed_at %}
+        <tr><th>Выполнена</th><td>{{ task.completed_at|date:"j E Y, H:i" }}</td></tr>
+      {% endif %}
+    </table>
+
+    <div class="d-flex flex-wrap">
+      <form method="post" action="{% url 'tasks:toggle' task.pk %}" class="mr-2 mb-2">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        {% if task.completed %}
+          <button type="submit" class="btn btn-outline-accent">Вернуть в работу</button>
+        {% else %}
+          <button type="submit" class="btn btn-accent">Отметить выполненной</button>
+        {% endif %}
+      </form>
+      <a class="btn btn-outline-secondary mr-2 mb-2"
+         href="{% url 'tasks:edit' task.pk %}?next={{ request.path|urlencode }}">Изменить</a>
+      <a class="btn btn-outline-danger mb-2" href="{% url 'tasks:delete' task.pk %}">Удалить</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

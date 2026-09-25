@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block menu %}
+  {% if user.is_authenticated %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'tasks:list' %}">Задачи</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'tasks:categories' %}">Категории</a></li>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  <div class="page-head">
+    <div>
+      <h1>Сводка</h1>
+      <p class="subtitle">Что требует внимания прямо сейчас.</p>
+    </div>
+    <a class="btn btn-accent" href="{% url 'tasks:new' %}">Новая задача</a>
+  </div>
+
+  <div class="tiles">
+    <a class="tile" href="{% url 'tasks:list' %}?tab=open">
+      <div class="num">{{ open_count }}</div><div class="cap">в работе</div></a>
+    <a class="tile" href="{% url 'tasks:list' %}?tab=overdue">
+      <div class="num {% if overdue_count %}text-danger{% endif %}">{{ overdue_count }}</div>
+      <div class="cap">просрочено</div></a>
+    <a class="tile" href="{% url 'tasks:list' %}?tab=done">
+      <div class="num">{{ done_count }}</div><div class="cap">выполнено</div></a>
+  </div>
+
+  {% if soon %}
+    <div class="panel mb-3">
+      <div class="panel-head"><h2 class="h6 mb-0">Срок на днях</h2></div>
+      <div class="table-responsive">
+        <table class="table table-hover task-table mb-0">
+          <tbody>{% for task in soon %}{% include 'tasks/_task_row.html' %}{% endfor %}</tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="h6 mb-0">Ближайшие задачи</h2>
+      <a class="small" href="{% url 'tasks:list' %}">Все задачи</a>
+    </div>
+    {% if next_tasks %}
+      <div class="table-responsive">
+        <table class="table table-hover task-table mb-0">
+          <tbody>{% for task in next_tasks %}{% include 'tasks/_task_row.html' %}{% endfor %}</tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="panel-body text-muted">Активных задач нет. Отдыхайте или запланируйте новое дело.</div>
+    {% endif %}
+  </div>
+{% else %}
+  <section class="cover">
+    <h1>Список дел, который не теряется</h1>
+    <p class="mb-4">Задачи со сроком, приоритетом и категорией. Просроченное сразу заметно,
+      выполненное уходит вниз. Ваш список не видит никто, кроме вас.</p>
+    <a class="btn btn-accent btn-lg mr-2 mb-2" href="{% url 'users:register' %}">Завести список</a>
+    <a class="btn btn-outline-light btn-lg mb-2" href="{% url 'users:login' %}">Войти</a>
+  </section>
+
+  <div class="row">
+    <div class="col-md-4 mb-3"><div class="panel h-100"><div class="panel-body">
+      <h2 class="h6">Сроки и приоритеты</h2>
+      <p class="meta mb-0">Высокий приоритет и ближайший срок поднимаются наверх списка автоматически.</p>
+    </div></div></div>
+    <div class="col-md-4 mb-3"><div class="panel h-100"><div class="panel-body">
+      <h2 class="h6">Категории</h2>
+      <p class="meta mb-0">Свои категории: учёба, дом, работа. Список фильтруется одним щелчком.</p>
+    </div></div></div>
+    <div class="col-md-4 mb-3"><div class="panel h-100"><div class="panel-body">
+      <h2 class="h6">Приватность</h2>
+      <p class="meta mb-0">Чужую задачу нельзя открыть, изменить или удалить даже по прямой ссылке.</p>
+    </div></div></div>
+  </div>
+{% endif %}
+{% endblock %}

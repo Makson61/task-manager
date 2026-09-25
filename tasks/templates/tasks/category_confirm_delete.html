@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Удалить категорию? &middot; {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="panel panel-narrow mx-auto border-danger">
+  <div class="panel-head"><h1 class="h5 mb-0">Удалить категорию?</h1></div>
+  <div class="panel-body">
+    <p class="wrap-any"><strong>{{ category.name }}</strong></p>
+    <p class="meta">Задачи из этой категории сохранятся, но останутся без категории.</p>
+    <form method="post" class="mt-4">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger btn-block mb-2">Да, удалить</button>
+      <a class="btn btn-outline-secondary btn-block" href="{% url 'tasks:categories' %}">Отмена</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

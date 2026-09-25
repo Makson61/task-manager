@@ -1,0 +1,34 @@
+# Описание бесплатного сервиса на Render (render.com).
+# Render соберёт образ по Dockerfile и выдаст адрес вида https://<имя>.onrender.com.
+# База данных - внешний PostgreSQL (бесплатный Neon), см. README.md.
+services:
+  - type: web
+    name: makson-task-manager
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /healthz/
+    autoDeploy: false
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        sync: false
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
+      - key: DEMO_DATA
+        value: "True"
+      - key: DEMO_PASSWORD
+        sync: false
+      # Render отдаёт сайт по HTTPS, поэтому HTTP перенаправляется.
+      - key: DJANGO_SECURE_SSL_REDIRECT
+        value: "True"
+      - key: DJANGO_HSTS_SECONDS
+        value: "31536000"
+      # На бесплатном плане 0,1 CPU: один процесс с потоками просыпается быстрее.
+      - key: WEB_CONCURRENCY
+        value: "1"

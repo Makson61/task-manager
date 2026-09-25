@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Мои задачи &middot; {{ block.super }}{% endblock %}
+
+{% block menu %}
+  <li class="nav-item"><a class="nav-link active" href="{% url 'tasks:list' %}">Задачи</a></li>
+  <li class="nav-item"><a class="nav-link" href="{% url 'tasks:categories' %}">Категории</a></li>
+{% endblock %}
+
+{% block menu_actions %}
+  <li class="nav-item"><a class="nav-link" href="{% url 'tasks:new' %}">Новая задача</a></li>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-head">
+  <div>
+    <h1>Мои задачи</h1>
+    <p class="subtitle">Сверху то, что важнее и ближе по сроку.</p>
+  </div>
+  <a class="btn btn-accent" href="{% url 'tasks:new' %}">Новая задача</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-3 sidebar mb-3">
+    <div class="panel mb-3">
+      <div class="panel-body">
+        <ul class="nav flex-column">
+          {% for key, label, total in tabs %}
+            <li class="nav-item">
+              <a class="nav-link{% if tab == key %} active{% endif %}"
+                 href="?tab={{ key }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}{% if category %}&amp;category={{ category }}{% endif %}">
+                {{ label }} <span class="count">{{ total }}</span></a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span class="small font-weight-bold">Категории</span>
+        <a class="small" href="{% url 'tasks:categories' %}">Править</a></div>
+      <div class="panel-body">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link{% if not category %} active{% endif %}" href="?tab={{ tab }}">Любая</a>
+          </li>
+          {% for item in categories %}
+            <li class="nav-item">
+              <a class="nav-link{% if category == item.pk|stringformat:'s' %} active{% endif %}"
+                 href="?tab={{ tab }}&amp;category={{ item.pk }}">{{ item.name }} <span class="count">{{ item.total }}</span></a>
+            </li>
+          {% empty %}
+            <li class="nav-item"><span class="meta">Категорий пока нет.</span></li>
+          {% endfor %}
+          {% if categories %}
+            <li class="nav-item">
+              <a class="nav-link{% if category == 'none' %} active{% endif %}"
+                 href="?tab={{ tab }}&amp;category=none">Без категории</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9">
+    <form method="get" class="mb-3" role="search">
+      <input type="hidden" name="tab" value="{{ tab }}">
+      {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+      <div class="input-group">
+        <input type="search" name="q" value="{{ query }}" class="form-control"
+               placeholder="Поиск по названию и описанию" aria-label="Поиск по задачам">
+        <div class="input-group-append">
+          <button class="btn btn-outline-accent" type="submit">Найти</button>
+          {% if query %}<a class="btn btn-outline-secondary" href="?tab={{ tab }}">Сброс</a>{% endif %}
+        </div>
+      </div>
+    </form>
+
+    {% if tasks %}
+      <div class="panel table-responsive">
+        <table class="table table-hover task-table">
+          <thead>
+            <tr>
+              <th class="td-check"><span class="sr-only">Готово</span></th>
+              <th>Задача</th>
+              <th class="d-none d-sm-table-cell">Приоритет</th>
+              <th>Срок</th>
+              <th class="text-right">Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}{% include 'tasks/_task_row.html' %}{% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+        <div class="d-flex justify-content-center mt-4">{% bootstrap_pagination page_obj url=request.get_full_path %}</div>
+      {% endif %}
+    {% elif no_tasks_at_all %}
+      <div class="empty">
+        <span class="icon" aria-hidden="true">🗒️</span>
+        <p>Задач пока нет. Запишите первое дело.</p>
+        <a class="btn btn-accent" href="{% url 'tasks:new' %}">Создать задачу</a>
+      </div>
+    {% elif tab == 'overdue' and not query %}
+      <div class="empty">
+        <span class="icon" aria-hidden="true">👌</span>
+        Просроченных задач нет.
+      </div>
+    {% else %}
+      <div class="empty">
+        <span class="icon" aria-hidden="true">🔍</span>
+        Под выбранные условия ничего не подошло.
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

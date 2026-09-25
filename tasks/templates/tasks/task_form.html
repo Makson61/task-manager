@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}{% if is_new %}Новая задача{% else %}Изменение задачи{% endif %} &middot; {{ block.super }}{% endblock %}
+
+{% block menu %}
+  <li class="nav-item"><a class="nav-link" href="{% url 'tasks:list' %}">Задачи</a></li>
+  <li class="nav-item"><a class="nav-link" href="{% url 'tasks:categories' %}">Категории</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-wide mx-auto">
+  <div class="panel-head">
+    <h1 class="h5 mb-0">{% if is_new %}Новая задача{% else %}Изменение задачи{% endif %}</h1>
+  </div>
+  <div class="panel-body">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
+      {% bootstrap_field form.title %}
+      {% bootstrap_field form.description %}
+      <div class="form-row">
+        <div class="col-md-6">{% bootstrap_field form.due_date %}</div>
+        <div class="col-md-6">{% bootstrap_field form.category %}</div>
+      </div>
+      <div class="priority-choice">{% bootstrap_field form.priority %}</div>
+      {% bootstrap_field form.completed %}
+      <div class="d-flex flex-wrap mt-3">
+        {% if is_new %}
+          {% bootstrap_button 'Создать задачу' button_type='submit' button_class='btn-accent mr-2 mb-2' %}
+        {% else %}
+          {% bootstrap_button 'Сохранить' button_type='submit' button_class='btn-accent mr-2 mb-2' %}
+        {% endif %}
+        <a class="btn btn-outline-secondary mb-2" href="{% url 'tasks:list' %}">Отмена</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

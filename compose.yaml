@@ -1,0 +1,26 @@
+services:
+  web:
+    # Образ собирается по Dockerfile из этого каталога.
+    build: .
+    restart: unless-stopped
+    # Настройки сервера читаются из .env; без него проект тоже запустится.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # База SQLite лежит на именованном томе и переживает пересборку контейнера.
+      SQLITE_PATH: ${SQLITE_PATH:-/app/data/db.sqlite3}
+    ports:
+      - "${APP_BIND_IP:-127.0.0.1}:${APP_PORT:-8000}:8000"
+    volumes:
+      - task_manager_data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz/', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  # Именованный том не удаляется при обычном пересоздании контейнера.
+  task_manager_data:
